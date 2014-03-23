@@ -11,13 +11,10 @@ a project based one java socket
 ###Project Infomation
 This is an assignment of distributed system programming
 
-### Project address:
-	This is my project [flight-tickets-service](https://github.com/wwsun/flight-tickets-service.git), welcome to visit it.
-
 ### Access protocol:
-	* HTTP: 'https://github.com/wwsun/flight-tickets-service.git' .
-	* SSH: 'git@github.com:wwsun/flight-tickets-service.git' .
+	* HTTP: 'https://github.com/wwsun/flight-tickets-service.git' 
+	* SSH: 'git@github.com:wwsun/flight-tickets-service.git' 
 
 ### How to get:
-	operation example:
+operation example:
 	$ git clone https://github.com/wwsun/flight-tickets-service.git
