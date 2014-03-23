@@ -10,7 +10,7 @@ import java.util.List;
 
 import fb.dao.FlightDao;
 import fb.dao.OrderDao;
-import fb.dao.impl.FilghtDaoImpl;
+import fb.dao.impl.FlightDaoImpl;
 import fb.dao.impl.OrderDaoImpl;
 import fb.entity.Flight;
 import fb.entity.Order;
@@ -180,7 +180,7 @@ class ServerThread implements Runnable {
 	 * @param toCity
 	 */
 	private static String queryFlightList(String fromCity, String toCity) {
-		FlightDao dao = new FilghtDaoImpl();
+		FlightDao dao = new FlightDaoImpl();
 		List<?> flightList = dao.queryFlightList(fromCity, toCity);
 		String result = build(flightList);
 		return result;

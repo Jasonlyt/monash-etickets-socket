@@ -22,5 +22,5 @@ public interface OrderDao {
 	 * @param fullname
 	 * @return
 	 */
-	public List checkOrders(String fullname);
+	public List<?> checkOrders(String fullname);
 }

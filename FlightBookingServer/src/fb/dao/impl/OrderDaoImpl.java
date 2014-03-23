@@ -60,7 +60,7 @@ public class OrderDaoImpl implements OrderDao {
 	}
 
 	@Override
-	public List checkOrders(String fullname) {
+	public List<Order> checkOrders(String fullname) {
 		String sql = "select * from ordertbl where fullname=?";
 		DBUtil util = new DBUtil();
 		Connection conn = util.getConn();

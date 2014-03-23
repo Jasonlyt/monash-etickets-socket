@@ -11,7 +11,7 @@ import java.net.Socket;
 import java.util.List;
 
 import fb.dao.FlightDao;
-import fb.dao.impl.FilghtDaoImpl;
+import fb.dao.impl.FlightDaoImpl;
 import fb.entity.Flight;
 
 public class FlightServerDemo {
@@ -66,7 +66,7 @@ public class FlightServerDemo {
 	 * @param toCity
 	 */
 	private static String queryFlightList(String fromCity, String toCity) {
-		FlightDao dao = new FilghtDaoImpl();
+		FlightDao dao = new FlightDaoImpl();
 		List<?> flightList = dao.queryFlightList(fromCity, toCity);
 		String result = build(flightList);
 		return result;
@@ -86,16 +86,6 @@ public class FlightServerDemo {
 					+ f.getTickets() + " tickets;";
 		}
 		return msg;
-	}
-
-	/**
-	 * order a ticket
-	 * 
-	 * @param flightNo
-	 *            Flight Number you want to order
-	 */
-	private static void orderFlight(String flightNo) {
-
 	}
 
 }

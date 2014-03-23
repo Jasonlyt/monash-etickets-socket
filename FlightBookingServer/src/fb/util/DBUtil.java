@@ -47,7 +47,7 @@ public final class DBUtil {
      * OPEN THE DATABASE CONNECTION
      * @return
      */
-    public static Connection getConn(){
+    public Connection getConn(){
     	Connection conn = null;
     	try {
 			conn = DriverManager.getConnection(url, user, password);

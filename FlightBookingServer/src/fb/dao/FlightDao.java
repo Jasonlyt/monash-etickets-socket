@@ -2,10 +2,11 @@ package fb.dao;
 
 import java.util.List;
 
-import fb.entity.Flight;
-
 
 public interface FlightDao {
+	
+	
+	public List<?> listFlights();
 	/**
 	 * query the flight remaining have tickets
 	 * 
