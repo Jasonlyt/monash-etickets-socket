@@ -1,6 +1,6 @@
 flight-tickets-service
 ======================
-a project based one java socket
+a project based on java socket
 -------------------------------
 ### About author
 + Name:	Weiwei SUN
