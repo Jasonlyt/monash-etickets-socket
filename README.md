@@ -3,8 +3,8 @@ flight-tickets-service
 a project based one java socket
 -------------------------------
 ### About author
-+ Name:Weiwei SUN
-+ Mail:ww.sun@outlook.com
++ Name:	Weiwei SUN
++ Mail:	ww.sun@outlook.com
 + Weibo:[http://weibo.com/swwol/home](http://weibo.com/swwol/home)
 
 
