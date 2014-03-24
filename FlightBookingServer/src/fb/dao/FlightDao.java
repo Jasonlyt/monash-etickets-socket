@@ -6,7 +6,7 @@ import java.util.List;
 public interface FlightDao {
 	
 	
-	public List<?> listFlights();
+	public List<?> listFlightsFromAll();
 	/**
 	 * query the flight remaining have tickets
 	 * 
@@ -14,8 +14,9 @@ public interface FlightDao {
 	 * @param toCity	The city you flight for
 	 * @return Flight
 	 */	
-	public List<?> queryFlightList(String fromCity, String toCity);
+	public List<?> queryFlightListFromAll(String fromCity, String toCity);
 	
+	public boolean queryTicketExistedFromCEA(String fid);
 	
-	//public void orderFlight(String flightNo);
+	public boolean updateTicketsToCEA(String fid);
 }

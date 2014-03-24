@@ -9,14 +9,17 @@ import java.net.Socket;
 import java.util.List;
 
 import fb.dao.FlightDao;
+import fb.dao.OrderDao;
 import fb.dao.impl.FlightDaoImpl;
+import fb.dao.impl.OrderDaoImpl;
 import fb.entity.Flight;
+import fb.entity.Order;
 
 public class CeaServer {
 	public static void main(String[] args) {
 		ServerSocket s = null;
 		try {
-			s = new ServerSocket(FlightBookingConstants.PORT2);
+			s = new ServerSocket(FlightBookingConstants.PORT_CEA);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -64,6 +67,8 @@ class CeaHandler extends Thread {
 					listRequest();
 				else if (line.startsWith(FlightBookingConstants.QUERY))
 					queryResponse(losePrefix(line, FlightBookingConstants.QUERY));
+				else if (line.startsWith(FlightBookingConstants.ORDER))
+					orderResponse(losePrefix(line, FlightBookingConstants.ORDER));
 				else {
 					writer.print(FlightBookingConstants.ERROR
 							+ FlightBookingConstants.CR_LF);
@@ -77,11 +82,33 @@ class CeaHandler extends Thread {
 		}
 	}
 
+	private void orderResponse(String str) {
+		String[] args = str.split(" ");
+		if(args.length ==2 ) {
+			String fid = args[0];
+			String username = args[1];
+			
+			FlightDao dao = new FlightDaoImpl();
+			OrderDao orderDao = new OrderDaoImpl();
+			if(dao.queryTicketExistedFromCEA(fid)){
+				if(dao.updateTicketsToCEA(fid)){
+					Order order = new Order();
+					order.setFid(fid);
+					order.setUsername(username);
+					orderDao.saveOrderToCEA(order);
+				}
+				
+			}
+		} else {
+			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
+		}
+	}
+
 	private void queryResponse(String cities) {
 		String[] city = cities.split(" ");
 		if (city.length == 2) {
 			FlightDao dao = new FlightDaoImpl();
-			List<?> list = dao.queryFlightList(city[0], city[1]);
+			List<?> list = dao.queryFlightListFromAll(city[0], city[1]);
 			if (list == null) {
 				writer.print(FlightBookingConstants.ERROR
 						+ FlightBookingConstants.CR_LF);
@@ -106,7 +133,7 @@ class CeaHandler extends Thread {
 
 	public void listRequest() {
 		FlightDao dao = new FlightDaoImpl();
-		List<?> list = dao.listFlights();
+		List<?> list = dao.listFlightsFromAll();
 		if (list == null) {
 			writer.print(FlightBookingConstants.ERROR
 					+ FlightBookingConstants.CR_LF);

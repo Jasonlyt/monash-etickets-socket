@@ -23,7 +23,7 @@ public class ProxyServer {
 				e.printStackTrace();
 				continue;
 			}
-			new SocketHandler(incoming).start();
+			new ProxySocketHandler(incoming).start();
 		}
 	}
 }

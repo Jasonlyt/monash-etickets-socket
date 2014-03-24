@@ -14,10 +14,11 @@ import fb.util.DBUtil;
 public class FlightDaoImpl implements fb.dao.FlightDao {
 
 	@Override
-	public List<Flight> queryFlightList(String fromCity, String toCity) {
+	public List<Flight> queryFlightListFromAll(String fromCity, String toCity) {
 		String sql = "select * from cea_flight where departure_city=? and destination_city=? "
-					+ "union select * from ac_flight where departure_city=? and destination_city=? "
-					+ "union select * from qantas_flight where departure_city=? and destination_city=? ";
+				+ "union select * from ac_flight where departure_city=? and destination_city=? "
+				+ "union select * from qantas_flight where departure_city=? and destination_city=? ";
+
 		DBUtil util = new DBUtil();
 		Connection conn = util.getConn();
 		
@@ -29,6 +30,7 @@ public class FlightDaoImpl implements fb.dao.FlightDao {
 			pstmt.setString(4, toCity);
 			pstmt.setString(5,fromCity);
 			pstmt.setString(6, toCity);
+
 			
 			ResultSet rs = pstmt.executeQuery();
 			List<Flight> list = new ArrayList<Flight>();
@@ -51,12 +53,18 @@ public class FlightDaoImpl implements fb.dao.FlightDao {
 			return list;
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
 
 	@Override
-	public List<?> listFlights() {
+	public List<?> listFlightsFromAll() {
 		
 		String sql = "select * from ac_flight"
 				+ " union select * from cea_flight"
@@ -98,6 +106,53 @@ public class FlightDaoImpl implements fb.dao.FlightDao {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public boolean queryTicketExistedFromCEA(String fid) {
+		String sql = "select tickets from cea_flight where fid=? ";
+		DBUtil util = new DBUtil();
+		Connection conn = util.getConn();
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, fid);
+			ResultSet rs = pstmt.executeQuery();
+			int tickets = rs.getInt("tickets");
+			if(tickets>0)
+				return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean updateTicketsToCEA(String fid) {
+		String sql = "update cea_flight set tickets=tickets-1 where fid = ? ";
+		DBUtil util = new DBUtil();
+		Connection conn = util.getConn();
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1,fid);
+			int status = pstmt.executeUpdate();
+			if(status == 1)
+				return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
 	}
 
 }

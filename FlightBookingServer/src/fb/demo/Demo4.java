@@ -12,7 +12,7 @@ public class Demo4 {
 	@Test
 	public void listRequest() {
 		FlightDao dao = new FlightDaoImpl();
-		List<?> list = dao.listFlights();
+		List<?> list = dao.listFlightsFromAll();
 		System.out.println(list.size());
 		build(list);
 

@@ -13,7 +13,7 @@ public class Demo2 {
 		//System.out.println(flightList.size());
 		//System.out.println(flightList);
 		
-		List<?> flightList = dao.listFlights();
+		List<?> flightList = dao.listFlightsFromAll();
 		System.out.println(flightList.size());
 		String rs = build(flightList);
 		System.out.println(rs);

@@ -8,7 +8,7 @@ import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class SocketHandler extends Thread {
+public class ProxySocketHandler extends Thread {
 	//private final int BUFFER_SIZE = 2048;
 	
 	/**
@@ -22,7 +22,7 @@ public class SocketHandler extends Thread {
 
 	private Socket ceaSocket;
 	
-	public SocketHandler(Socket incoming) {
+	public ProxySocketHandler(Socket incoming) {
 		this.incoming = incoming;
 	}	
 	
@@ -31,7 +31,7 @@ public class SocketHandler extends Thread {
 		try {
 			
 			InetAddress address = InetAddress.getByName("localhost");
-			ceaSocket = new Socket(address,FlightBookingConstants.PORT2);
+			ceaSocket = new Socket(address,FlightBookingConstants.PORT_CEA);
 			
 			
 			/**
@@ -58,6 +58,8 @@ public class SocketHandler extends Thread {
 					listRequest();
 				} else if (line.startsWith(FlightBookingConstants.QUERY)) {
 					queryResponse(losePrefix(line,FlightBookingConstants.QUERY));
+				} else if (line.startsWith(FlightBookingConstants.ORDER)){
+					orderResonse(losePrefix(line,FlightBookingConstants.ORDER));
 				} else if (line.startsWith(FlightBookingConstants.QUIT)){
 					break;
 				} else {
@@ -67,6 +69,39 @@ public class SocketHandler extends Thread {
 			incoming.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void orderResonse(String str) {
+		try {
+			ceaReader = new BufferedReader(new InputStreamReader(ceaSocket.getInputStream()));
+			ceaWriter = new PrintStream(ceaSocket.getOutputStream());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		/**
+		 * All CEA orders will be handled by CEAServer
+		 * FID like CEA010101
+		 */
+		if(str.startsWith(FlightBookingConstants.CEA)){
+			ceaWriter.print(FlightBookingConstants.ORDER+" "+str+FlightBookingConstants.CR_LF);
+			String line;
+			try {
+				line = ceaReader.readLine();
+				if(line.equals(FlightBookingConstants.SUCCEEDED))
+					writer.print(line+FlightBookingConstants.CR_LF);
+				else
+					writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else if(str.startsWith(FlightBookingConstants.AC)){
+			
+		} else if(str.startsWith(FlightBookingConstants.QAN)){
+			
+		} else {
+			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
 		}
 	}
 
