@@ -1,4 +1,4 @@
-package fb.demo;
+package fb.common;
 
 public class FlightBookingConstants {
 	public static final int PORT = 8188;

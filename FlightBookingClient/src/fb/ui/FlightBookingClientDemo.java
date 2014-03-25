@@ -1,4 +1,4 @@
-package fb.demo;
+package fb.ui;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +8,9 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class FlightBookingClient {
+import fb.common.FlightBookingConstants;
+
+public class FlightBookingClientDemo {
 
 	private final static String UI_LIST = "list";
 	private final static String UI_QUERY = "query";
@@ -27,18 +29,19 @@ public class FlightBookingClient {
 			System.err.println("Usage: Client address");
 			return;
 		}
-
-		new FlightBookingClient(args[0]);
-
+		FlightBookingClientDemo client = new FlightBookingClientDemo(args[0]);
+		client.loop();
 	}
+
+	
 
 	/**
 	 * constructor with one parameter
 	 * 
 	 * @param server
 	 */
-	public FlightBookingClient(String server) {
-
+	public FlightBookingClientDemo(String server) {
+		
 		InetAddress address = null;
 		try {
 			address = InetAddress.getByName(server);
@@ -76,6 +79,7 @@ public class FlightBookingClient {
 		while (true) {
 			String line = null;
 			try {
+				System.out.println("===============");
 				System.out.println("Enter request: ");
 				line = console.readLine();
 				System.out.println("Request was " + line);
@@ -93,7 +97,8 @@ public class FlightBookingClient {
 			} else if (line.toLowerCase().startsWith(UI_TIME)) {
 				// time<start,back>
 			} else if (line.toLowerCase().startsWith(UI_ORDER)) {
-				// order<fid>
+				// order<fid,username>
+				orderRequest(losePrefix(line, UI_ORDER));
 			} else if (line.equalsIgnoreCase(UI_QUIT)) {
 				exit();
 			} else {
@@ -101,6 +106,28 @@ public class FlightBookingClient {
 			}
 		}
 
+	}
+	
+	private void loop() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void orderRequest(String str) {
+		writer.print(FlightBookingConstants.ORDER+" "+str+FlightBookingConstants.CR_LF);
+		String response = null;
+		
+		try {
+			response = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		if(response.equals(FlightBookingConstants.ERROR))
+			System.out.println("Error in ORDER request");
+		else{
+			System.out.println("ORDER successfully, your FID: "+str);
+		}
 	}
 
 	private void queryRequest(String cities) {
@@ -112,8 +139,9 @@ public class FlightBookingClient {
 			e.printStackTrace();
 			return;
 		}
-		if(response.equals(FlightBookingConstants.ERROR))
+		if(response.equals(FlightBookingConstants.ERROR)){
 			System.out.println("Error in QUERY request");
+		}
 		else{
 			System.out.println("The available flights are:");
 		
