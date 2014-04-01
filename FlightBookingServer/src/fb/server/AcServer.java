@@ -13,16 +13,16 @@ import fb.common.FlightBookingConstants;
 import fb.entity.Flight;
 import fb.entity.Order;
 
-public class CeaServer {
+public class AcServer {
 	public static void main(String[] args) {
 		ServerSocket s = null;
 		try {
-			s = new ServerSocket(FlightBookingConstants.PORT_CEA);
+			s = new ServerSocket(FlightBookingConstants.PORT_AC);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
-		System.out.println("CHINA EASTERN AIRLINES Server is running");
+		System.out.println("AIRLINE CHINA Server is running");
 
 		while (true) {
 			Socket incoming = null;
@@ -32,28 +32,28 @@ public class CeaServer {
 				e.printStackTrace();
 				continue;
 			}
-			new CeaHandler(incoming).start();
+			new AcHandler(incoming).start();
 		}
 	}
 }
 
-class CeaHandler extends Thread {
+class AcHandler extends Thread{
 	Socket incoming;
 	BufferedReader reader;
 	PrintStream writer;
-	ChildServerHOPP ceaHOPP = new ChildServerHOPP();
-
-	public CeaHandler(Socket incoming) {
+	ChildServerHOPP acHOPP = new ChildServerHOPP();
+	
+	AcHandler(Socket incoming){
 		this.incoming = incoming;
 	}
-
+	
 	@Override
 	public void run() {
 		try {
 			reader = new BufferedReader(new InputStreamReader(
 					incoming.getInputStream()));
 			writer = new PrintStream(incoming.getOutputStream());
-			writer.print("CEA Server send response!"
+			writer.print("AC Server send response!"
 					+ FlightBookingConstants.CR_LF);
 
 			while (true) {
@@ -81,9 +81,9 @@ class CeaHandler extends Thread {
 			e.printStackTrace();
 		}
 	}
-
+	
 	private void checkResponse(String str) {
-		List<Order> list = ceaHOPP.checkOrders(str);
+		List<Order> list = acHOPP.checkOrders(str);
 		String msg = "";
 		if(list == null){
 			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
@@ -97,7 +97,7 @@ class CeaHandler extends Thread {
 	}
 
 	private void regResponse(String str) {
-		if(ceaHOPP.regResp(str)){
+		if(acHOPP.regResp(str)){
 			writer.print(FlightBookingConstants.SUCCEEDED+FlightBookingConstants.CR_LF);
 			writer.print(FlightBookingConstants.SUCCEEDED+FlightBookingConstants.CR_LF);
 		}else{
@@ -107,17 +107,19 @@ class CeaHandler extends Thread {
 	}
 
 	private void orderResponse(String str) {
-		if(ceaHOPP.orderResp(str)){
+		if(acHOPP.orderResp(str)){
 			writer.print(FlightBookingConstants.SUCCEEDED+FlightBookingConstants.CR_LF);
 			writer.print(FlightBookingConstants.SUCCEEDED+FlightBookingConstants.CR_LF);
+
 		}else{
 			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
 			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
+
 		}
 	}
 
 	private void queryResponse(String cities) {
-		List<Flight> list = ceaHOPP.queryRespFromCeaDB(cities);
+		List<Flight> list = acHOPP.queryRespFromCeaDB(cities);
 		if (list == null){
 			writer.print(FlightBookingConstants.ERROR
 					+ FlightBookingConstants.CR_LF);
@@ -131,9 +133,12 @@ class CeaHandler extends Thread {
 		}
 	}
 
+
 	private String losePrefix(String str, String prefix) {
 		int index = prefix.length();
 		String ret = str.substring(index).trim();
 		return ret;
 	}
+	
 }
+

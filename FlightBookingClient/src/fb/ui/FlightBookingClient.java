@@ -44,10 +44,10 @@ public class FlightBookingClient {
 			try {
 				System.out.println("==============================");
 				System.out.println("Flight Booking request options: "
-						+ FlightBookingConstants.LIST + " | "
 						+ FlightBookingConstants.QUERY + " | "
-						+ FlightBookingConstants.TIME + " | "
-						+ FlightBookingConstants.ORDER + " | Enter "
+						+ FlightBookingConstants.REG + " | "
+						+ FlightBookingConstants.ORDER + " | "
+						+ FlightBookingConstants.CHECK + " | Enter "
 						+ FlightBookingConstants.QUIT + " to exit.");
 				System.out.println("Enter request: ");
 				
@@ -59,36 +59,60 @@ public class FlightBookingClient {
 				System.exit(1);
 			}
 
-			if (line.equalsIgnoreCase(FlightBookingConstants.LIST)) {
-				// list the available flights
-				list();
-			} else if (line.toUpperCase().startsWith(FlightBookingConstants.QUERY)) {
-				// query<from,to>
+			if (line.toUpperCase().startsWith(FlightBookingConstants.QUERY)) {
+				// query <from,to>
 				query(losePrefix(line, FlightBookingConstants.QUERY));
-			} else if (line.toUpperCase().startsWith(FlightBookingConstants.TIME)) {
-				// time<start,back>
+			} else if (line.toUpperCase().startsWith(FlightBookingConstants.REG)) {
+				// reg <airline,username,phone,email,creditcard>
+				register(losePrefix(line, FlightBookingConstants.REG));
 			} else if (line.toUpperCase().startsWith(FlightBookingConstants.ORDER)) {
-				// order<fid,username>
+				// order <fid1,fid2,username>
+				order(losePrefix(line, FlightBookingConstants.ORDER));
+			} else if (line.toUpperCase().startsWith(FlightBookingConstants.CHECK)) {
+				// check <airline,username>
+				check(losePrefix(line,FlightBookingConstants.CHECK));
 			} else if (line.equalsIgnoreCase(FlightBookingConstants.QUIT)) {
-				//exit();
+				quit();
 			} else {
 			}
 		
 		}
 	}
 	
+
+	private void check(String input) {
+		String[] list = clientHOPP.CheckReq(input);
+		for (String str : list) {
+			System.out.println(str);
+		}
+	}
+
+	private void register(String input) {
+		if(clientHOPP.regReq(input)){
+			System.out.println("Register your infomation successfully!");
+		}else
+			System.out.println("Failed");;
+	}
+
+	private void order(String input) {
+		if(clientHOPP.orderReq(input))
+			System.out.println("ORDER successfully");
+		else
+			System.out.println("Failed");
+	}
+
 	private void query(String input) {
 		String[] list = clientHOPP.queryReq(input);
 		listOutput(list);
 	}
 
-	private void list() {
-		String[] list = clientHOPP.listReq();
-		listOutput(list);
-	}
 	
+	private void quit() {
+		clientHOPP.quit();
+		System.out.println("You have quit the system successfully!");
+	}
 	/**
-	 * Output the specified list
+	 * Public operation: Output the specified list
 	 * @param list
 	 */
 	private void listOutput(String[] list) {
@@ -103,7 +127,7 @@ public class FlightBookingClient {
 	}
 
 	/**
-	 * Given that the string starts with the prefix, get rid of the prefix
+	 * Public operation: Given that the string starts with the prefix, get rid of the prefix
 	 * and any whitespace
 	 * @param str
 	 * @param prefix

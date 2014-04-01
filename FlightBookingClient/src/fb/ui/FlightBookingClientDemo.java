@@ -12,7 +12,6 @@ import fb.common.FlightBookingConstants;
 
 public class FlightBookingClientDemo {
 
-	private final static String UI_LIST = "list";
 	private final static String UI_QUERY = "query";
 	private final static String UI_TIME = "time";
 	private final static String UI_ORDER = "order";
@@ -88,10 +87,7 @@ public class FlightBookingClientDemo {
 				exit();
 			}
 
-			if (line.equalsIgnoreCase(UI_LIST)) {
-				// list the available flights
-				listRequest();
-			} else if (line.toLowerCase().startsWith(UI_QUERY)) {
+			if (line.toLowerCase().startsWith(UI_QUERY)) {
 				// query<from,to>
 				queryRequest(losePrefix(line, UI_QUERY));
 			} else if (line.toLowerCase().startsWith(UI_TIME)) {
@@ -156,22 +152,6 @@ public class FlightBookingClientDemo {
 					break;
 				System.out.println(line);
 			}
-		}
-	}
-
-	private void listRequest() {
-		writer.print(FlightBookingConstants.LIST+FlightBookingConstants.CR_LF);
-		System.out.println("Listing the availiable flights: ");
-		String line = null;
-		while(true){
-			try {
-				line = reader.readLine();
-			} catch (IOException e) {
-				break;
-			}
-			if(line.equals(""))
-				break;
-			System.out.println(line);
 		}
 	}
 

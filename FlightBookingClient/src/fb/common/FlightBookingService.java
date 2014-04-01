@@ -1,12 +1,12 @@
 package fb.common;
 
 public interface FlightBookingService {
-	
-	public String[] listReq();
-	
+		
 	public String[] queryReq(String input);
 	
-	public String[] timeReq(String input);
+	public String[] CheckReq(String input);
+	
+	public boolean regReq(String input);
 	
 	public boolean orderReq(String fid);
 	

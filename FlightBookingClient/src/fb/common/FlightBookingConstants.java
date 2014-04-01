@@ -2,9 +2,9 @@ package fb.common;
 
 public class FlightBookingConstants {
 	public static final int PORT = 8188;
-	public static final String LIST = "LIST";
+	public static final String CHECK = "CHECK";
 	public static final String QUERY = "QUERY";
-	public static final String TIME = "TIME";
+	public static final String REG = "REG";
 	public static final String ORDER = "ORDER";
 	public static final String QUIT = "QUIT";
 	public static final String SUCCEEDED = "SUCCEEDED";

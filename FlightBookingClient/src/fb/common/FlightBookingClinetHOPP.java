@@ -31,27 +31,6 @@ public class FlightBookingClinetHOPP implements FlightBookingService {
 	    writer = new PrintStream(outStream);
 	}
 	
-	
-	
-	@Override
-	public String[] listReq() {
-		writer.print(FlightBookingConstants.LIST+FlightBookingConstants.CR_LF);
-		List<String> list = new ArrayList<String>();
-		String line = null;
-		while(true){
-			try {
-				line = reader.readLine();
-			} catch (IOException e) {
-				break;
-			}
-			if(line.equals(""))
-				break;
-			list.add(line);
-		}
-		String[] flightList = new String[list.size()];
-		list.toArray(flightList);
-		return flightList;
-	}
 
 	@Override
 	public String[] queryReq(String input) {
@@ -68,7 +47,7 @@ public class FlightBookingClinetHOPP implements FlightBookingService {
 			System.out.println("Error in QUERY request");
 		}
 		else{
-			System.out.println("The available flights are:");
+			//System.out.println("The available flights are:");
 			String line = null;
 			while(true){
 				try {
@@ -76,8 +55,46 @@ public class FlightBookingClinetHOPP implements FlightBookingService {
 				} catch (IOException e) {
 					break;
 				}
-				if(line.equals(""))
+				if(line.equals("")){
+					try {
+						response = reader.readLine();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					if(response.equals(FlightBookingConstants.ERROR)){
+						System.out.println("Error in QUERY request");
+					} else {
+						while(true){
+							try {
+								line = reader.readLine();
+							} catch (IOException e) {
+								e.printStackTrace();
+							} if(line.equals("")){
+								try {
+									response = reader.readLine();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+								if(response.equals(FlightBookingConstants.ERROR)){
+									System.out.println("ERROR in QUERY request");
+								} else {
+									while(true){
+										try {
+											line = reader.readLine();
+										} catch (IOException e) {
+											e.printStackTrace();
+										} if (line.equals(""))
+											break;
+										list.add(line);
+									}
+								}
+								break;
+							}
+							list.add(line);
+						}
+					}
 					break;
+				}
 				list.add(line);
 			}
 		}
@@ -87,15 +104,40 @@ public class FlightBookingClinetHOPP implements FlightBookingService {
 	}
 
 	@Override
-	public String[] timeReq(String input) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean regReq(String input) {
+		writer.print(FlightBookingConstants.REG+" "+input+FlightBookingConstants.CR_LF);
+		String response = null;
+		try {
+			response = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if(response.equals(FlightBookingConstants.SUCCEEDED))
+			return true;
+		else if(response.equals(FlightBookingConstants.ERROR))
+			return false;
+		else{
+			System.out.println("Unrecogized error!----->reg");
+			return false;
+		}
+			
 	}
 
-	@Override
-	public boolean orderReq(String fid) {
-		// TODO Auto-generated method stub
-		return false;
+	// order fid1 fid2 username
+	public boolean orderReq(String str) {
+		writer.print(FlightBookingConstants.ORDER+" "+str+FlightBookingConstants.CR_LF);
+		String response = null;
+		try {
+			response = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		if(response.equals(FlightBookingConstants.SUCCEEDED))
+			return true;
+		else{
+			return false;
+		}
 	}
 
 	@Override
@@ -108,7 +150,26 @@ public class FlightBookingClinetHOPP implements FlightBookingService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
 
+
+	@Override
+	public String[] CheckReq(String input) {
+		writer.print(FlightBookingConstants.CHECK+" "+input+FlightBookingConstants.CR_LF);
+		String response = null;
+		try {
+			response = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		if(response.equals(FlightBookingConstants.ERROR)){
+			System.out.println("Error in CHECK request");
+		}else {
+			String[] order = response.split(":");
+			return order;
+		}
+		return null;
 	}
 
 }
