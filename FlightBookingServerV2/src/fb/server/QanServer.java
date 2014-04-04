@@ -13,16 +13,16 @@ import fb.common.FlightBookingConstants;
 import fb.entity.Flight;
 import fb.entity.Order;
 
-public class CeaServer {
+public class QanServer {
 	public static void main(String[] args) {
 		ServerSocket s = null;
 		try {
-			s = new ServerSocket(FlightBookingConstants.PORT_CEA);
+			s = new ServerSocket(FlightBookingConstants.PORT_QAN);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
-		System.out.println("CHINA EASTERN AIRLINES Server is running");
+		System.out.println("QANTAS Server is running");
 
 		while (true) {
 			Socket incoming = null;
@@ -32,28 +32,29 @@ public class CeaServer {
 				e.printStackTrace();
 				continue;
 			}
-			new CeaHandler(incoming).start();
+			new QanHandler(incoming).start();
 		}
 	}
 }
 
-class CeaHandler extends Thread {
+class QanHandler extends Thread{
+	
 	Socket incoming;
 	BufferedReader reader;
 	PrintStream writer;
-	ChildServerHOPP ceaHOPP = new ChildServerHOPP();
+	ChildServerHOPP qanHOPP = new ChildServerHOPP();
 
-	public CeaHandler(Socket incoming) {
+	public QanHandler(Socket incoming) {
 		this.incoming = incoming;
 	}
-
+	
 	@Override
 	public void run() {
 		try {
 			reader = new BufferedReader(new InputStreamReader(
 					incoming.getInputStream()));
 			writer = new PrintStream(incoming.getOutputStream());
-			writer.print("CEA Server send response!"
+			writer.print("QANTAS Server send response!"
 					+ FlightBookingConstants.CR_LF);
 
 			while (true) {
@@ -69,6 +70,8 @@ class CeaHandler extends Thread {
 					orderResponse(losePrefix(line, FlightBookingConstants.ORDER));
 				else if (line.startsWith(FlightBookingConstants.CHECK))
 					checkResponse(losePrefix(line, FlightBookingConstants.CHECK));
+				else if (line.startsWith(FlightBookingConstants.QUIT))
+					quit();
 				else {
 					writer.print(FlightBookingConstants.ERROR
 							+ FlightBookingConstants.CR_LF);
@@ -81,49 +84,58 @@ class CeaHandler extends Thread {
 			e.printStackTrace();
 		}
 	}
+	private void quit() {
+		try {
+			writer.close();
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-	private void checkResponse(String str) {
-		List<Order> list = ceaHOPP.checkOrders(str);
-		String msg = "";
-		if(list == null){
-			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
+	private synchronized void checkResponse(String str) {
+		List<Order> list = qanHOPP.checkOrders(str);
+		if (list == null){
+			writer.print(FlightBookingConstants.ERROR
+					+ FlightBookingConstants.CR_LF);
 		} else {
-			for (Order o : list) {
-				msg += o.getFid()+":";
+			for (Order order : list) {
+				String msg = order.getFid();
+				System.out.println(msg);
+				writer.print(msg+FlightBookingConstants.CR_LF);
 			}
-			writer.print(msg+FlightBookingConstants.CR_LF);
-			writer.print(msg+FlightBookingConstants.CR_LF);
+			writer.print(FlightBookingConstants.CR_LF);
 		}
 	}
 
-	private void regResponse(String str) {
-		if(ceaHOPP.regResp(str)){
+	private synchronized void regResponse(String str) {
+		if(qanHOPP.regResp(str)){
 			writer.print(FlightBookingConstants.SUCCEEDED+FlightBookingConstants.CR_LF);
+			//writer.print(FlightBookingConstants.SUCCEEDED+FlightBookingConstants.CR_LF);
+		}else{
+			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
+			//writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
+		}
+		writer.print(FlightBookingConstants.CR_LF);
+	}
+
+	private synchronized void orderResponse(String str) {
+		if(qanHOPP.orderResp(str)){
 			writer.print(FlightBookingConstants.SUCCEEDED+FlightBookingConstants.CR_LF);
 		}else{
 			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
-			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
 		}
+		writer.print(FlightBookingConstants.CR_LF);
 	}
 
-	private void orderResponse(String str) {
-		if(ceaHOPP.orderResp(str)){
-			writer.print(FlightBookingConstants.SUCCEEDED+FlightBookingConstants.CR_LF);
-			writer.print(FlightBookingConstants.SUCCEEDED+FlightBookingConstants.CR_LF);
-		}else{
-			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
-			writer.print(FlightBookingConstants.ERROR+FlightBookingConstants.CR_LF);
-		}
-	}
-
-	private void queryResponse(String cities) {
-		List<Flight> list = ceaHOPP.queryRespFromCeaDB(cities);
+	private synchronized void queryResponse(String input) {
+		List<Flight> list = qanHOPP.queryRespFromQanDB(input);
 		if (list == null){
 			writer.print(FlightBookingConstants.ERROR
 					+ FlightBookingConstants.CR_LF);
 		} else {
 			for (Flight f : list) {
-				String msg = f.getFid()+" [Departure]"+f.getDeparting_date()+" [Tickets]"+f.getTickets();
+				String msg = f.getFid()+" [Departure]"+f.getDeparting_date()+" [Tickets]"+f.getTickets()+" [price]"+f.getPrice();
 				System.out.println(msg);
 				writer.print(msg + FlightBookingConstants.CR_LF);
 			}
@@ -136,4 +148,6 @@ class CeaHandler extends Thread {
 		String ret = str.substring(index).trim();
 		return ret;
 	}
+	
+	
 }

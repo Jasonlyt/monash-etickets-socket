@@ -10,7 +10,14 @@ public class Flight {
 	private Date departing_date;
 	private Date returning_date;
 	private int tickets;
+	private int price;
 	
+	public int getPrice() {
+		return price;
+	}
+	public void setPrice(int price) {
+		this.price = price;
+	}
 	public int getTickets() {
 		return tickets;
 	}
